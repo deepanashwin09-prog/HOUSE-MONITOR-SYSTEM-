@@ -123,3 +123,21 @@ footer {
         padding: 25px 15px;
     }
 }
+* CONTROL BUTTON */
+
+button {
+    margin-top: 15px;
+    padding: 10px 22px;
+    border: none;
+    border-radius: 8px;
+    background: #1e293b;
+    color: white;
+    font-family: 'Poppins', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: 0.85;
+}
