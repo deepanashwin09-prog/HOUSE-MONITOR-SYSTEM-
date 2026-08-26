@@ -25,11 +25,16 @@
 
     <main class="dashboard">
 
-        <div class="card">
-            <h2>📡 ESP32</h2>
-            <p class="status connected">Connected</p>
-        </div>
+        <<div class="card">
+    <h2>📡 ESP32</h2>
 
+    <div class="device-status">
+        <span id="espIndicator" class="indicator online"></span>
+        <span id="espStatus">ONLINE</span>
+    </div>
+
+    <p id="lastUpdate">Last update: Just now</p>
+    </div>
         <div class="card">
             <h2>🌡️ Temperature</h2>
             <p class="value">28°C</p>
