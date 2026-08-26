@@ -1,0 +1,1 @@
+console.log("HOUSE MONITOR SYSTEM started");
