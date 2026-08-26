@@ -141,3 +141,36 @@ button {
 button:hover {
     opacity: 0.85;
 }
+/* ESP32 CONNECTION STATUS */
+
+.device-status {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin: 15px 0;
+    font-weight: 600;
+    font-size: 20px;
+}
+
+.indicator {
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.indicator.online {
+    background: #22c55e;
+    box-shadow: 0 0 10px #22c55e;
+}
+
+.indicator.offline {
+    background: #ef4444;
+    box-shadow: 0 0 10px #ef4444;
+}
+
+#lastUpdate {
+    font-size: 13px;
+    color: #64748b;
+}
