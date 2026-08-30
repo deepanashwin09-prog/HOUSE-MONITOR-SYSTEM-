@@ -1,5 +1,5 @@
 // ESP32 IP address
-const esp32IP = "10.193.187.169";
+const esp32IP = "10.32.84.169";
 
 function toggleLED() {
 
