@@ -25,37 +25,51 @@
 
     <main class="dashboard">
 
-        <<div class="card">
-    <h2>📡 ESP32</h2>
+        <!-- ESP32 STATUS -->
+        <div class="card">
+            <h2>📡 ESP32</h2>
 
-    <div class="device-status">
-        <span id="espIndicator" class="indicator online"></span>
-        <span id="espStatus">ONLINE</span>
-    </div>
+            <div class="device-status">
+                <span id="espIndicator" class="indicator online"></span>
+                <span id="espStatus">ONLINE</span>
+            </div>
 
-    <p id="lastUpdate">Last update: Just now</p>
-    </div>
+            <p id="lastUpdate">Last update: Just now</p>
+        </div>
+
+
+        <!-- TEMPERATURE -->
         <div class="card">
             <h2>🌡️ Temperature</h2>
             <p class="value">28°C</p>
         </div>
 
+
+        <!-- HUMIDITY -->
         <div class="card">
             <h2>💧 Humidity</h2>
             <p class="value">65%</p>
         </div>
 
+
+        <!-- RAIN -->
         <div class="card">
             <h2>🌧️ Rain Status</h2>
             <p class="status">No Rain</p>
         </div>
 
-      <div class="card">
-    <h2>💡 Light</h2>
-    <p id="lightStatus" class="status">OFF</p>
-    <button id="lightButton" onclick="toggleLight()">Turn ON</button>
-       </div>
 
+        <!-- LED LIGHT -->
+        <div class="card">
+            <h2>💡 LED LIGHT</h2>
+
+            <p id="ledStatus" class="status">OFF</p>
+
+            <button id="ledButton" onclick="toggleLED()">TURN ON</button>
+        </div>
+
+
+        <!-- MOTION -->
         <div class="card">
             <h2>🚶 Motion</h2>
             <p class="status">No Motion</p>
@@ -63,9 +77,11 @@
 
     </main>
 
+
     <footer>
         <p>HOUSE MONITOR SYSTEM © 2026</p>
     </footer>
+
 
     <script src="script.js"></script>
 
