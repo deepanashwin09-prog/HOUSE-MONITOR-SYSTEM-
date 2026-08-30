@@ -1,47 +1,42 @@
-let lightOn = false;
+// ESP32 IP address
+const esp32IP = "10.193.187.169";
 
-function toggleLight() {
+function toggleLED() {
 
-    lightOn = !lightOn;
+    const status = document.getElementById("ledStatus");
+    const button = document.getElementById("ledButton");
 
-    const lightStatus = document.getElementById("lightStatus");
-    const lightButton = document.getElementById("lightButton");
+    if (status.innerText === "OFF") {
 
-    if (lightOn) {
-        lightStatus.textContent = "ON";
-        lightStatus.style.color = "green";
-        lightButton.textContent = "Turn OFF";
-    } else {
-        lightStatus.textContent = "OFF";
-        lightStatus.style.color = "";
-        lightButton.textContent = "Turn ON";
-    }
-}
-// ESP32 STATUS
+        fetch("http://" + esp32IP + "/led/on")
+            .then(response => response.text())
+            .then(data => {
 
-let esp32Online = true;
+                status.innerText = "ON";
+                button.innerText = "TURN OFF";
 
-function updateESP32Status() {
+            })
+            .catch(error => {
 
-    const indicator = document.getElementById("espIndicator");
-    const status = document.getElementById("espStatus");
-    const lastUpdate = document.getElementById("lastUpdate");
+                status.innerText = "ESP32 NOT REACHABLE";
 
-    if (esp32Online) {
-
-        indicator.className = "indicator online";
-        status.textContent = "ONLINE";
-
-        lastUpdate.textContent =
-            "Last update: " + new Date().toLocaleTimeString();
+            });
 
     } else {
 
-        indicator.className = "indicator offline";
-        status.textContent = "OFFLINE";
+        fetch("http://" + esp32IP + "/led/off")
+            .then(response => response.text())
+            .then(data => {
 
-        lastUpdate.textContent = "ESP32 not connected";
+                status.innerText = "OFF";
+                button.innerText = "TURN ON";
+
+            })
+            .catch(error => {
+
+                status.innerText = "ESP32 NOT REACHABLE";
+
+            });
+
     }
 }
-
-updateESP32Status();
