@@ -4,9 +4,16 @@ function toggleLED() {
     const status = document.getElementById("ledStatus");
     const button = document.getElementById("ledButton");
 
-    // OFF → turn ON (1)
-    // ON → turn OFF (0)
-    const state = status.innerText.trim() === "OFF" ? "1" : "0";
+    // Decide next state
+    const currentState = status.innerText.trim();
+
+    let state;
+
+    if (currentState === "OFF") {
+        state = "1";
+    } else {
+        state = "0";
+    }
 
     status.innerText = "WAITING...";
     button.disabled = true;
@@ -14,30 +21,37 @@ function toggleLED() {
     fetch(${bridgeURL}/api/led?state=${state})
         .then(response => {
             if (!response.ok) {
-                throw new Error("Bridge API error");
+                throw new Error("API error: " + response.status);
             }
 
             return response.json();
         })
         .then(data => {
-            if (!data.success) {
-                throw new Error(data.error || "Blynk error");
-            }
 
-            if (state === "1") {
-                status.innerText = "ON";
-                button.innerText = "TURN OFF";
+            console.log("API response:", data);
+
+            if (data.success === true) {
+
+                if (state === "1") {
+                    status.innerText = "ON";
+                    button.innerText = "TURN OFF";
+                } else {
+                    status.innerText = "OFF";
+                    button.innerText = "TURN ON";
+                }
+
             } else {
-                status.innerText = "OFF";
-                button.innerText = "TURN ON";
+                throw new Error(data.error || "Unknown error");
             }
         })
         .catch(error => {
+
+            console.error("LED ERROR:", error);
+
             status.innerText = "ERROR";
-            console.error("LED error:", error);
+
         })
         .finally(() => {
             button.disabled = false;
         });
-}
 }
