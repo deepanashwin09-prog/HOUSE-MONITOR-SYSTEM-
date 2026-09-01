@@ -4,45 +4,44 @@ async function toggleLED() {
     const status = document.getElementById("ledStatus");
     const button = document.getElementById("ledButton");
 
-    const isOff = status.textContent.trim() === "OFF";
-    const state = isOff ? "1" : "0";
+    // Decide next state
+    const currentState = status.innerText.trim();
 
+    const nextState = currentState === "OFF" ? "1" : "0";
+
+    status.innerText = "WAITING...";
     button.disabled = true;
-    button.textContent = "WAITING...";
-    status.textContent = "WAITING...";
 
     try {
         const response = await fetch(
-            ${bridgeURL}/api/led?state=${state}
+            ${bridgeURL}/api/led?state=${nextState}
         );
+
+        if (!response.ok) {
+            throw new Error(Server returned ${response.status});
+        }
 
         const data = await response.json();
 
-        console.log("Bridge response:", data);
-
         if (!data.success) {
-            throw new Error(data.error || "API failed");
+            throw new Error(data.error || "LED API error");
         }
 
-        if (state === "1") {
-            status.textContent = "ON";
-            button.textContent = "TURN OFF";
+        // Update webpage only after API succeeds
+        if (nextState === "1") {
+            status.innerText = "ON";
+            button.innerText = "TURN OFF";
         } else {
-            status.textContent = "OFF";
-            button.textContent = "TURN ON";
+            status.innerText = "OFF";
+            button.innerText = "TURN ON";
         }
 
     } catch (error) {
-        console.error(error);
+        console.error("LED control error:", error);
 
-        status.textContent = "ERROR";
-        button.textContent = "TRY AGAIN";
-
-    } finally {
-        button.disabled = false;
+        status.innerText = "ERROR";
+        button.innerText = "TRY AGAIN";
     }
-}
-        .finally(() => {
-            button.disabled = false;
-        });
+
+    button.disabled = false;
 }
