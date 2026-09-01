@@ -4,29 +4,40 @@ function toggleLED() {
     const status = document.getElementById("ledStatus");
     const button = document.getElementById("ledButton");
 
-    const action = status.innerText === "OFF" ? "on" : "off";
+    // OFF → turn ON (1)
+    // ON → turn OFF (0)
+    const state = status.innerText.trim() === "OFF" ? "1" : "0";
 
     status.innerText = "WAITING...";
+    button.disabled = true;
 
-    fetch(${bridgeURL}/api/led?action=${action})
+    fetch(${bridgeURL}/api/led?state=${state})
         .then(response => {
             if (!response.ok) {
-                throw new Error("Bridge error");
+                throw new Error("Bridge API error");
             }
 
-            return response.text();
+            return response.json();
         })
         .then(data => {
-            status.innerText = data.replace("LED ", "");
+            if (!data.success) {
+                throw new Error(data.error || "Blynk error");
+            }
 
-            if (action === "on") {
+            if (state === "1") {
+                status.innerText = "ON";
                 button.innerText = "TURN OFF";
             } else {
+                status.innerText = "OFF";
                 button.innerText = "TURN ON";
             }
         })
         .catch(error => {
             status.innerText = "ERROR";
-            console.log(error);
+            console.error("LED error:", error);
+        })
+        .finally(() => {
+            button.disabled = false;
         });
+}
 }
