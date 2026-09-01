@@ -1,42 +1,32 @@
-// ESP32 IP address
-const esp32IP = "10.32.84.169";
+const bridgeURL = "https://house-monitor-bridge-api.vercel.app";
 
 function toggleLED() {
-
     const status = document.getElementById("ledStatus");
     const button = document.getElementById("ledButton");
 
-    if (status.innerText === "OFF") {
+    const action = status.innerText === "OFF" ? "on" : "off";
 
-        fetch("http://" + esp32IP + "/led/on")
-            .then(response => response.text())
-            .then(data => {
+    status.innerText = "WAITING...";
 
-                status.innerText = "ON";
+    fetch(${bridgeURL}/api/led?action=${action})
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Bridge error");
+            }
+
+            return response.text();
+        })
+        .then(data => {
+            status.innerText = data.replace("LED ", "");
+
+            if (action === "on") {
                 button.innerText = "TURN OFF";
-
-            })
-            .catch(error => {
-
-                status.innerText = "ESP32 NOT REACHABLE";
-
-            });
-
-    } else {
-
-        fetch("http://" + esp32IP + "/led/off")
-            .then(response => response.text())
-            .then(data => {
-
-                status.innerText = "OFF";
+            } else {
                 button.innerText = "TURN ON";
-
-            })
-            .catch(error => {
-
-                status.innerText = "ESP32 NOT REACHABLE";
-
-            });
-
-    }
+            }
+        })
+        .catch(error => {
+            status.innerText = "ERROR";
+            console.log(error);
+        });
 }
