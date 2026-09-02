@@ -1,12 +1,11 @@
 const bridgeURL = "https://house-monitor-bridge-api.vercel.app";
 
-let ledState = 0; // 0 = OFF, 1 = ON
+let ledState = 0;
 
 async function toggleLED() {
     const status = document.getElementById("ledStatus");
     const button = document.getElementById("ledButton");
 
-    // Change to opposite state
     const newState = ledState === 0 ? 1 : 0;
 
     status.innerText = "WAITING...";
@@ -23,8 +22,6 @@ async function toggleLED() {
 
         const data = await response.json();
 
-        console.log("Vercel response:", data);
-
         if (data.success === true) {
             ledState = newState;
 
@@ -36,7 +33,7 @@ async function toggleLED() {
                 button.innerText = "TURN ON";
             }
         } else {
-            throw new Error(data.error || "LED control failed");
+            throw new Error("LED control failed");
         }
 
     } catch (error) {
