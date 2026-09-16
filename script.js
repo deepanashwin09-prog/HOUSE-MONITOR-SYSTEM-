@@ -104,38 +104,57 @@ updateDashboard();
 // Update every 2 seconds
 setInterval(updateDashboard, 2000);
 
-const rainAPI = "https://house-monitor-bridge-api.vercel.app/api/rain";
+// ================= RAIN STATUS =================
+
+const rainAPI =
+    "https://house-monitor-bridge-api.vercel.app/api/rain";
 
 async function updateRainStatus() {
-    const rainStatus = document.getElementById("rainStatus");
+
+    const rainElement = document.getElementById("rainStatus");
+
+    if (!rainElement) {
+        console.log("rainStatus element not found");
+        return;
+    }
 
     try {
-        const response = await fetch(rainAPI);
+
+        const response = await fetch(rainAPI, {
+            cache: "no-store"
+        });
 
         if (!response.ok) {
-            throw new Error("Rain API error");
+            throw new Error("Rain API HTTP error: " + response.status);
         }
 
         const data = await response.json();
 
+        console.log("Rain API:", data);
+
         if (data.success === true) {
+
             if (Number(data.rain) === 1) {
-                rainStatus.innerText = "🌧️ RAIN DETECTED";
+                rainElement.textContent = "🌧️ RAIN DETECTED";
             } else {
-                rainStatus.innerText = "☀️ NO RAIN";
+                rainElement.textContent = "☀️ NO RAIN";
             }
+
         } else {
-            rainStatus.innerText = "ERROR";
+            rainElement.textContent = "RAIN ERROR";
         }
 
     } catch (error) {
-        console.error("Rain error:", error);
-        rainStatus.innerText = "OFFLINE";
+
+        console.error("Rain connection error:", error);
+        rainElement.textContent = "RAIN OFFLINE";
+
     }
 }
 
+
+// Start immediately
+updateRainStatus();
+
 // Update every 2 seconds
 setInterval(updateRainStatus, 2000);
-
-// Get status immediately
-updateRainStatus();
