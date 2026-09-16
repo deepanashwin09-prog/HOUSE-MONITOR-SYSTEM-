@@ -174,3 +174,10 @@ button:hover {
     font-size: 13px;
     color: #64748b;
 }
+
+#RAINSTATUS {
+    font-size: 32px;
+    font-weidht: 600;
+    text-align: center;
+    margin-top: 20px;
+}
