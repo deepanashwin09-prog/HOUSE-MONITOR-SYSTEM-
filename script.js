@@ -187,16 +187,48 @@ function startVoiceControl() {
     // Start microphone
     recognition.start();
 
-    // When speech is recognized
-    recognition.onresult = function(event) {
+recognition.onresult = async function(event) {
 
-        const command =
-            event.results[0][0].transcript.toLowerCase();
+    const command =
+        event.results[0][0].transcript.toLowerCase();
 
-        console.log("Voice command:", command);
+    console.log("Voice command:", command);
 
-        voiceStatus.innerText = command;
-    };
+    voiceStatus.innerText = command;
+
+    if (command.includes("turn on the light")) {
+
+        voiceStatus.innerText = "💡 TURNING LIGHT ON";
+
+        try {
+
+            const response = await fetch(
+                `${bridgeURL}/api/led?state=1`
+            );
+
+            const data = await response.json();
+
+            if (data.success === true) {
+
+                document.getElementById("ledStatus").innerText = "ON";
+                document.getElementById("ledButton").innerText = "TURN OFF";
+
+                voiceStatus.innerText = "💡 LIGHT ON";
+
+            } else {
+
+                voiceStatus.innerText = "❌ LIGHT ERROR";
+
+            }
+
+        } catch (error) {
+
+            console.error("Voice LED error:", error);
+
+            voiceStatus.innerText = "❌ CONNECTION ERROR";
+        }
+    }
+};
 
     // If an error happens
     recognition.onerror = function(event) {
