@@ -158,3 +158,58 @@ updateRainStatus();
 
 // Update every 2 seconds
 setInterval(updateRainStatus, 2000);
+
+function startVoiceControl() {
+
+    const voiceStatus = document.getElementById("voiceStatus");
+
+    // Check whether the browser supports speech recognition
+    const SpeechRecognition =
+        window.SpeechRecognition ||
+        window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+        voiceStatus.innerText = "NOT SUPPORTED";
+        alert("Speech recognition is not supported in this browser.");
+        return;
+    }
+
+    // Create speech recognition
+    const recognition = new SpeechRecognition();
+
+    // Listen for one command
+    recognition.lang = "en-US";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    voiceStatus.innerText = "🎤 LISTENING...";
+
+    // Start microphone
+    recognition.start();
+
+    // When speech is recognized
+    recognition.onresult = function(event) {
+
+        const command =
+            event.results[0][0].transcript.toLowerCase();
+
+        console.log("Voice command:", command);
+
+        voiceStatus.innerText = command;
+    };
+
+    // If an error happens
+    recognition.onerror = function(event) {
+
+        console.error("Voice error:", event.error);
+
+        voiceStatus.innerText = "VOICE ERROR";
+    };
+
+    // When listening finishes
+    recognition.onend = function() {
+
+        console.log("Voice recognition stopped");
+
+    };
+}
