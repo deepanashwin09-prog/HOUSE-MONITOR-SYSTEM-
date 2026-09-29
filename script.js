@@ -19,45 +19,35 @@ async function updateDashboard() {
             throw new Error("Invalid status data");
         }
 
-
         // Temperature
         document.querySelector(".card:nth-child(2) .value").innerText =
             `${data.temperature}°C`;
 
-
         // Humidity
         document.querySelector(".card:nth-child(3) .value").innerText =
             `${data.humidity}%`;
-
 
         // LED
         const ledStatus = document.getElementById("ledStatus");
         const ledButton = document.getElementById("ledButton");
 
         if (data.led === 1) {
-
             ledStatus.innerText = "ON";
             ledButton.innerText = "TURN OFF";
-
         } else {
-
             ledStatus.innerText = "OFF";
             ledButton.innerText = "TURN ON";
-
         }
 
-
-        // ESP32 status
+        // ESP32
         document.getElementById("espStatus").innerText = "ONLINE";
 
         document.getElementById("espIndicator").className =
             "indicator online";
 
-
         // Last update
         document.getElementById("lastUpdate").innerText =
             "Last update: " + new Date().toLocaleTimeString();
-
 
     } catch (error) {
 
@@ -67,7 +57,6 @@ async function updateDashboard() {
 
         document.getElementById("espIndicator").className =
             "indicator offline";
-
     }
 }
 
@@ -77,22 +66,16 @@ async function updateDashboard() {
 async function toggleLED() {
 
     const status = document.getElementById("ledStatus");
-
     const button = document.getElementById("ledButton");
-
 
     const currentState =
         status.innerText === "ON" ? 1 : 0;
 
-
     const newState =
         currentState === 1 ? 0 : 1;
 
-
     status.innerText = "WAITING...";
-
     button.disabled = true;
-
 
     try {
 
@@ -100,55 +83,33 @@ async function toggleLED() {
             `${bridgeURL}/api/led?state=${newState}`
         );
 
-
         if (!response.ok) {
             throw new Error("LED API error");
         }
 
-
         const data = await response.json();
-
 
         if (!data.success) {
             throw new Error("LED control failed");
         }
 
-
         if (newState === 1) {
-
             status.innerText = "ON";
-
             button.innerText = "TURN OFF";
-
         } else {
-
             status.innerText = "OFF";
-
             button.innerText = "TURN ON";
-
         }
-
 
     } catch (error) {
 
         console.error("LED error:", error);
 
         status.innerText = "ERROR";
-
     }
 
-
     button.disabled = false;
-
 }
-
-
-// Update dashboard immediately
-updateDashboard();
-
-// Update dashboard every 2 seconds
-setInterval(updateDashboard, 2000);
-
 
 
 // ================= RAIN STATUS =================
@@ -162,15 +123,9 @@ async function updateRainStatus() {
     const rainElement =
         document.getElementById("rainStatus");
 
-
     if (!rainElement) {
-
-        console.log("rainStatus element not found");
-
         return;
-
     }
-
 
     try {
 
@@ -178,21 +133,11 @@ async function updateRainStatus() {
             cache: "no-store"
         });
 
-
         if (!response.ok) {
-
-            throw new Error(
-                "Rain API HTTP error: " + response.status
-            );
-
+            throw new Error("Rain API error");
         }
 
-
         const data = await response.json();
-
-
-        console.log("Rain API:", data);
-
 
         if (data.success === true) {
 
@@ -205,38 +150,22 @@ async function updateRainStatus() {
 
                 rainElement.textContent =
                     "☀️ NO RAIN";
-
             }
 
         } else {
 
             rainElement.textContent =
                 "RAIN ERROR";
-
         }
-
 
     } catch (error) {
 
-        console.error(
-            "Rain connection error:",
-            error
-        );
+        console.error("Rain error:", error);
 
         rainElement.textContent =
             "RAIN OFFLINE";
-
     }
-
 }
-
-
-// Update rain immediately
-updateRainStatus();
-
-// Update rain every 2 seconds
-setInterval(updateRainStatus, 2000);
-
 
 
 // ================= VOICE CONTROL =================
@@ -246,262 +175,258 @@ function startVoiceControl() {
     const voiceStatus =
         document.getElementById("voiceStatus");
 
-
-    // Check browser speech recognition support
     const SpeechRecognition =
         window.SpeechRecognition ||
         window.webkitSpeechRecognition;
-
 
     if (!SpeechRecognition) {
 
         voiceStatus.innerText =
             "NOT SUPPORTED";
 
-        alert(
-            "Speech recognition is not supported in this browser."
-        );
-
         return;
-
     }
 
-
-    // Create speech recognition object
     const recognition =
         new SpeechRecognition();
 
-
-    // Voice language
     recognition.lang = "en-US";
 
-
-    // Listen for one command
     recognition.continuous = false;
 
-
-    // Wait for final result
     recognition.interimResults = false;
 
 
-    // Show listening status
     voiceStatus.innerText =
         "🎤 LISTENING...";
 
 
-    // ================= SPEECH RESULT =================
+    // ================= VOICE RESULT =================
 
-    recognition.onresult =
-        async function(event) {
+    recognition.onresult = async function(event) {
 
-            const command =
-                event.results[0][0].transcript
-                    .toLowerCase()
-                    .trim();
+        const command =
+            event.results[0][0].transcript
+                .toLowerCase()
+                .trim();
 
+        console.log("Voice command:", command);
 
-            console.log(
-                "Voice command:",
-                command
-            );
+        voiceStatus.innerText = command;
 
 
-            // Show recognized command
+        // ================= TURN ON =================
+
+        if (
+            command.includes("turn on the light") ||
+            command.includes("turn on light") ||
+            command.includes("light on") ||
+            command.includes("on the light")
+        ) {
+
             voiceStatus.innerText =
-                command;
+                "💡 TURNING LIGHT ON";
 
+            try {
 
-            // ================= TURN ON LIGHT =================
-
-            if (
-                command.includes("turn on the light") ||
-                command.includes("turn on light") ||
-                command.includes("light on")
-            ) {
-
-                voiceStatus.innerText =
-                    "💡 TURNING LIGHT ON";
-
-
-                try {
-
-                    const response =
-                        await fetch(
-                            `${bridgeURL}/api/led?state=1`
-                        );
-
-
-                    if (!response.ok) {
-
-                        throw new Error(
-                            "LED API error"
-                        );
-
-                    }
-
-
-                    const data =
-                        await response.json();
-
-
-                    if (data.success === true) {
-
-                        document.getElementById(
-                            "ledStatus"
-                        ).innerText = "ON";
-
-
-                        document.getElementById(
-                            "ledButton"
-                        ).innerText =
-                            "TURN OFF";
-
-
-                        voiceStatus.innerText =
-                            "💡 LIGHT ON";
-
-
-                    } else {
-
-                        voiceStatus.innerText =
-                            "❌ LIGHT ERROR";
-
-                    }
-
-
-                } catch (error) {
-
-                    console.error(
-                        "Voice LED error:",
-                        error
+                const response =
+                    await fetch(
+                        `${bridgeURL}/api/led?state=1`
                     );
 
-
-                    voiceStatus.innerText =
-                        "❌ CONNECTION ERROR";
-
+                if (!response.ok) {
+                    throw new Error("LED API error");
                 }
 
-            }
+                const data =
+                    await response.json();
 
+                if (data.success === true) {
 
-            // ================= TURN OFF LIGHT =================
+                    document.getElementById(
+                        "ledStatus"
+                    ).innerText = "ON";
 
-            else if (
-                command.includes("turn off the light") ||
-                command.includes("turn off light") ||
-                command.includes("light off")
-            ) {
+                    document.getElementById(
+                        "ledButton"
+                    ).innerText = "TURN OFF";
+
+                    voiceStatus.innerText =
+                        "💡 LIGHT ON";
+
+                } else {
+
+                    voiceStatus.innerText =
+                        "❌ LIGHT ERROR";
+                }
+
+            } catch (error) {
+
+                console.error(
+                    "Voice LED error:",
+                    error
+                );
 
                 voiceStatus.innerText =
-                    "💡 TURNING LIGHT OFF";
+                    "❌ CONNECTION ERROR";
+            }
+        }
 
 
-                try {
+        // ================= TURN OFF =================
 
-                    const response =
-                        await fetch(
-                            `${bridgeURL}/api/led?state=0`
-                        );
+        else if (
+            command.includes("turn off the light") ||
+            command.includes("turn off light") ||
+            command.includes("light off") ||
+            command.includes("turn of the light") ||
+            command.includes("turn of light") ||
+            command.includes("off the light") ||
+            command.includes("off light")
+        ) {
 
+            voiceStatus.innerText =
+                "💡 TURNING LIGHT OFF";
 
-                    if (!response.ok) {
+            try {
 
-                        throw new Error(
-                            "LED API error"
-                        );
-
-                    }
-
-
-                    const data =
-                        await response.json();
-
-
-                    if (data.success === true) {
-
-                        document.getElementById(
-                            "ledStatus"
-                        ).innerText = "OFF";
-
-
-                        document.getElementById(
-                            "ledButton"
-                        ).innerText =
-                            "TURN ON";
-
-
-                        voiceStatus.innerText =
-                            "💡 LIGHT OFF";
-
-
-                    } else {
-
-                        voiceStatus.innerText =
-                            "❌ LIGHT ERROR";
-
-                    }
-
-
-                } catch (error) {
-
-                    console.error(
-                        "Voice LED error:",
-                        error
+                const response =
+                    await fetch(
+                        `${bridgeURL}/api/led?state=0`
                     );
 
-
-                    voiceStatus.innerText =
-                        "❌ CONNECTION ERROR";
-
+                if (!response.ok) {
+                    throw new Error("LED API error");
                 }
 
-            }
+                const data =
+                    await response.json();
 
+                if (data.success === true) {
 
-            // ================= UNKNOWN COMMAND =================
+                    document.getElementById(
+                        "ledStatus"
+                    ).innerText = "OFF";
 
-            else {
+                    document.getElementById(
+                        "ledButton"
+                    ).innerText = "TURN ON";
+
+                    voiceStatus.innerText =
+                        "💡 LIGHT OFF";
+
+                } else {
+
+                    voiceStatus.innerText =
+                        "❌ LIGHT ERROR";
+                }
+
+            } catch (error) {
+
+                console.error(
+                    "Voice LED error:",
+                    error
+                );
 
                 voiceStatus.innerText =
-                    "❓ COMMAND NOT RECOGNIZED";
-
+                    "❌ CONNECTION ERROR";
             }
+        }
 
-        };
+
+        // ================= UNKNOWN COMMAND =================
+
+        else {
+
+            voiceStatus.innerText =
+                "❓ COMMAND NOT RECOGNIZED";
+        }
+
+
+        // Listen again automatically
+        setTimeout(() => {
+
+            startVoiceControl();
+
+        }, 1000);
+
+    };
 
 
     // ================= VOICE ERROR =================
 
-    recognition.onerror =
-        function(event) {
+    recognition.onerror = function(event) {
 
-            console.error(
-                "Voice error:",
-                event.error
-            );
+        console.error(
+            "Voice error:",
+            event.error
+        );
 
+        voiceStatus.innerText =
+            "🎤 READY";
 
-            voiceStatus.innerText =
-                "VOICE ERROR";
-
-        };
+    };
 
 
     // ================= VOICE ENDED =================
 
-    recognition.onend =
-        function() {
+    recognition.onend = function() {
 
-            console.log(
-                "Voice recognition stopped"
-            );
+        console.log(
+            "Voice recognition stopped"
+        );
 
-        };
+    };
 
 
-    // ================= START MICROPHONE =================
+    // ================= START =================
 
-    recognition.start();
+    try {
 
+        recognition.start();
+
+    } catch (error) {
+
+        console.log(
+            "Voice start error:",
+            error
+        );
+    }
 }
+
+
+// ================= START DASHBOARD =================
+
+updateDashboard();
+
+setInterval(
+    updateDashboard,
+    2000
+);
+
+updateRainStatus();
+
+setInterval(
+    updateRainStatus,
+    2000
+);
+
+
+// ================= AUTO START VOICE =================
+
+// Try to start voice automatically
+window.addEventListener(
+    "load",
+    function() {
+
+        setTimeout(
+            function() {
+
+                startVoiceControl();
+
+            },
+            1500
+        );
+
+    }
+);
