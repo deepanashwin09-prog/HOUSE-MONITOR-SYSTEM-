@@ -198,7 +198,7 @@ function startVoiceControl() {
 
 
     voiceStatus.innerText =
-        "🎤 LISTENING...";
+        "LISTENING...";
 
 
     // ================= VOICE RESULT =================
